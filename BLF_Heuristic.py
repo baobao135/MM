@@ -8,7 +8,6 @@ class Rectangle:
         self.x = 0
         self.y = 0
     def sortShape(shape):
-
         # Sort the shapes based on their area in descending order
         shape.sort(key=lambda temp: temp.width * temp.height, reverse=True)
         return shape
@@ -23,7 +22,7 @@ class BLF:
         for _ in range(shape.demand):
             x, y = self.find_position(shape)
             if x is not None and y is not None:
-                new_shape = Rectangle(shape.width, shape.height, 1)
+                new_shape = Rectangle(shape.width, shape.height, 0)
                 new_shape.x = x
                 new_shape.y = y
                 self.stock.append(new_shape)
@@ -35,27 +34,25 @@ class BLF:
         for position in self.stock:
             temp=[(position.x + shape.width, position.y),(position.x, position.y + shape.height)]
             for (x, y) in temp:
-                print(x, y)
                 if self.can_place(shape, x, y):
-                    if best_x is None or x > best_x:
-                        best_x = x
-                    if best_y is None or y > best_y:
-                        best_y = y
+                    if best_y is None or (y < best_y) or (y == best_y and x < best_x):
+                        best_x, best_y = x, y 
                         
-        if not self.stock:
-            best_x, best_y = shape.width, shape.height
+        if not self.stock and self.can_place(shape, 0, 0):
+            best_x, best_y = 0, 0
 
         return best_x, best_y
-    def can_place (self, shape, width, height):
-        if shape.width + width > self.stock_w or shape.height + height > self.stock_h:
+    def can_place (self, shape, x, y):
+        if shape.width + x > self.stock_w or shape.height + y > self.stock_h:
             return False
         else:
             for position in self.stock:
-                if shape.width + width < position.x and shape.height + height < position.y:
+                if shape.width + x <= position.x + position.width and shape.height + y <= position.y + position.height:
                     return False
         return True
-    
-    
+    def display_stock (self):
+        for temp in range(len(self.stock)):
+            print (temp, "shape:", self.stock[temp].width, self.stock[temp].height, self.stock[temp].x, self.stock[temp].y)
     
 if __name__ == "__main__":
     with open('input.txt', 'r') as file:
@@ -67,15 +64,13 @@ if __name__ == "__main__":
     for width, height, demand in zip(width, height, demand):
         shapes.append(Rectangle( width, height, demand))
     shapes= Rectangle.sortShape(shapes)
+    print(shapes)
     for temp in shapes:
         if not blf.place_shape(temp):
-            for temp1 in shapes:
-                blf.place_shape(temp1)
             blf.stock_h = 100
             blf.stock_w = 100
+            blf.display_stock()
             blf.stock = []
-            blf.stock_idx += 1
         
-    print ("stock_index: ", blf.stock_idx)
     
     
