@@ -78,6 +78,8 @@ if __name__ == "__main__":
                 blf.stock_idx += 1
             temp.demand = temp.demand - 1
             count += 1
+        blf.stock_idx += 1
+        blf.stock = []
         print(count)
     print("Total stock: ", blf.stock_idx)    
     
