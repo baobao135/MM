@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 class Rectangle:
     def __init__(self, width, height, demand):
@@ -16,7 +17,7 @@ class BLF:
     def __init__(self, stock_w, stock_h):
         self.stock_w = stock_w
         self.stock_h = stock_h
-        self.stock_idx = -1
+        self.stock_idx = 0
         self.stock = []
     def place_shape (self, shape):
         x, y = self.find_position(shape)
@@ -31,7 +32,7 @@ class BLF:
     def find_position(self, shape):
         best_x, best_y = None, None
         for position in self.stock:
-            temp=[(position.x + shape.width, position.y),(position.x, position.y + shape.height)]
+            temp=[(position.x + position.width, position.y),(position.x, position.y + position.height)]
             for (x, y) in temp:
                 if self.can_place(shape, x, y):
                     if best_y is None or (y < best_y) or (y == best_y and x < best_x):
@@ -46,14 +47,40 @@ class BLF:
             return False
         else:
             for position in self.stock:
-                if shape.width + x <= position.x + position.width and shape.height + y <= position.y + position.height:
+                if  x < position.x + position.width and y < position.y + position.height:
                     return False
         return True
     def display_stock (self,):
         for temp in range(len(self.stock)):
             print ("shape:", self.stock[temp].width, self.stock[temp].height, self.stock[temp].x, self.stock[temp].y)
+    
+    def draw_stock(self):
+        fig, ax = plt.subplots()
+        ax.add_patch(plt.Rectangle((0, 0), self.stock_w, self.stock_h, edgecolor='black', facecolor='lightgrey'))
+
+        color_map = {}
+        
+        for shape in self.stock:
+            size_key = (shape.width, shape.height)
+            if size_key not in color_map:
+                color_map[size_key] = np.random.rand(3,)
+            color = color_map[size_key]
             
-            
+            ax.add_patch(plt.Rectangle((shape.x, shape.y), shape.width, shape.height, edgecolor='black', facecolor=color, lw=2))
+            ax.text(shape.x + shape.width / 2, shape.y + shape.height / 2, 
+                    f'{shape.width}x{shape.height}', 
+                    ha='center', va='center', color='black', fontsize=8)
+
+        ax.set_xlim(0, self.stock_w)
+        ax.set_ylim(0, self.stock_h)
+        ax.set_aspect('equal')
+        plt.title('2D Cutting Stock Problem')
+        plt.xlabel('Width')
+        plt.ylabel('Height')
+
+        plt.show()        
+
+       
         
 if __name__ == "__main__":
     with open('input.txt', 'r') as file:
@@ -74,13 +101,13 @@ if __name__ == "__main__":
                 blf.stock_h = 100
                 blf.stock_w = 100
                 blf.display_stock()
+                blf.draw_stock()
                 blf.stock = []
                 blf.stock_idx += 1
             temp.demand = temp.demand - 1
             count += 1
-        blf.stock_idx += 1
-        blf.stock = []
         print(count)
-    print("Total stock: ", blf.stock_idx)    
-    
-    
+    print("Total stock: ", blf.stock_idx + 1) 
+    if(len(blf.stock)!=0):
+        blf.draw_stock()
+   
