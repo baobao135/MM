@@ -19,6 +19,7 @@ class BLF:
         self.stock_h = stock_h
         self.stock_idx = 0
         self.stock = []
+        self.waste = self.stock_w * self.stock_h
     def place_shape (self, shape):
         x, y = self.find_position(shape)
         if x is not None and y is not None:
@@ -50,7 +51,7 @@ class BLF:
                 if  x < position.x + position.width and y < position.y + position.height:
                     return False
         return True
-    def display_stock (self,):
+    def display_stock (self):
         for temp in range(len(self.stock)):
             print ("shape:", self.stock[temp].width, self.stock[temp].height, self.stock[temp].x, self.stock[temp].y)
     
@@ -95,19 +96,24 @@ if __name__ == "__main__":
     print(shapes)
     count = 0
     for temp in shapes:
-        count = 0
-        while temp.demand != 0:
+        count = temp.demand
+        while temp.demand > 0:
             if not blf.place_shape(temp):
                 blf.stock_h = 100
                 blf.stock_w = 100
                 blf.display_stock()
                 blf.draw_stock()
                 blf.stock = []
+                blf.waste=blf.waste + blf.stock_w*blf.stock_h
                 blf.stock_idx += 1
-            temp.demand = temp.demand - 1
-            count += 1
-        print(count)
-    print("Total stock: ", blf.stock_idx + 1) 
+            else:
+                blf.waste = blf.waste - (temp.width * temp.height)
+                temp.demand = temp.demand - 1
+                print(count-temp.demand)
+    print("Total stock: ", blf.stock_idx + 1)
+    print("Total area: ",(blf.stock_idx + 1)*100*100) 
+    print("Total waste: ", blf.waste, "percentage: ", blf.waste/((blf.stock_idx + 1)*100*100))
     if(len(blf.stock)!=0):
+        blf.display_stock()
         blf.draw_stock()
    
