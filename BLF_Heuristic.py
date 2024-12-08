@@ -99,6 +99,13 @@ if __name__ == "__main__":
         count = temp.demand
         while temp.demand > 0:
             if not blf.place_shape(temp):
+                for temp1 in shapes:
+                    while temp1.demand > 0:
+                        if not blf.place_shape(temp1):
+                            break
+                        else:
+                            blf.waste = blf.waste - (temp1.width * temp1.height)
+                            temp1.demand = temp1.demand - 1
                 blf.stock_h = 100
                 blf.stock_w = 100
                 blf.display_stock()
@@ -110,10 +117,11 @@ if __name__ == "__main__":
                 blf.waste = blf.waste - (temp.width * temp.height)
                 temp.demand = temp.demand - 1
                 print(count-temp.demand)
-    print("Total stock: ", blf.stock_idx + 1)
-    print("Total area: ",(blf.stock_idx + 1)*100*100) 
-    print("Total waste: ", blf.waste, "percentage: ", blf.waste/((blf.stock_idx + 1)*100*100))
     if(len(blf.stock)!=0):
         blf.display_stock()
         blf.draw_stock()
+    print("Total stock: ", blf.stock_idx + 1)
+    print("Total area: ",(blf.stock_idx + 1)*100*100) 
+    print("Total waste: ", blf.waste, "percentage: ", blf.waste/((blf.stock_idx + 1)*100*100))
+    
    
